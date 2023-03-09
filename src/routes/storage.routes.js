@@ -2,6 +2,8 @@ const express = require('express')
 const multer = require('multer')
 const path = require('path')
 
+const HOST = process.env.HOST || 'http://localhost:5000'
+
 const diskStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, '../uploads'))
@@ -26,8 +28,13 @@ class StorageRoutes {
     this.router.post('/upload', upload.single('file'), (req, res) => {
       res.status(200).json({
         message: 'File uploaded successfully',
+        link: `${HOST}/storage/${req.file.filename}`,
         file: req.file
       })
+    })
+    this.router.get('/:filename', (req, res) => {
+      const file = path.join(__dirname, '../uploads', req.params.filename)
+      res.sendFile(file)
     })
   }
 }
